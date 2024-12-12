@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const Flowchart = require('../models/flowchart');  
 
 beforeAll(async () => {
-  const url = 'mongodb+srv://avinashsarojpersonal:avidb123@cluster0.jaer6.mongodb.net/flowcraft?retryWrites=true&w=majority&appName=Cluster0';  
+  const url = process.env.MONGO_URI;  
   await mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 });
 
