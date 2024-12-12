@@ -207,5 +207,62 @@ exports.validateFlowchart = async (req, res) => {
   }
 };
 
+// Add a helper function for traversing the graph
+const findConnectedNodes = (node, flowchart) => {
+  let connectedNodes = new Set();
+  let visited = new Set();
+
+  // Recursive DFS function to traverse nodes
+  const dfs = (currentNode) => {
+    if (visited.has(currentNode)) return;  // Prevent infinite loops
+    visited.add(currentNode);
+
+    // Add current node to connected nodes
+    connectedNodes.add(currentNode);
+
+    // Find outgoing edges from the current node
+    const outgoingEdges = flowchart.edges.filter(
+      (edge) => edge.from === currentNode
+    );
+
+    // Visit all nodes connected via outgoing edges
+    outgoingEdges.forEach((edge) => {
+      dfs(edge.to);
+    });
+  };
+
+  // Start DFS traversal from the initial node
+  dfs(node);
+
+  // Remove the starting node (if it exists in the set)
+  connectedNodes.delete(node);
+
+  return Array.from(connectedNodes);
+};
+
+// Function to get all connected nodes (directly or indirectly)
+exports.getConnectedNodes = async (req, res) => {
+  const { id, nodeName } = req.params;
+
+  try {
+    // Fetch flowchart by ID
+    const flowchart = await Flowchart.findById(id);
+    if (!flowchart) {
+      return res.status(404).json({ message: "Flowchart not found" });
+    }
+
+    // Get all connected nodes
+    const connectedNodes = findConnectedNodes(nodeName, flowchart);
+
+    // Return connected nodes as response
+    res.status(200).json({
+      success: true,
+      data: connectedNodes,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching connected nodes" });
+  }
+};
 
 

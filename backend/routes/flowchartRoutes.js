@@ -7,6 +7,7 @@ const {
   getAllFlowcharts,
   getOutgoingEdges,
   validateFlowchart,
+  getConnectedNodes,
 } = require("../controllers/flowchartController");
 
 const router = express.Router();
@@ -312,6 +313,48 @@ router.get("/:id/outgoing/:nodeName", getOutgoingEdges);
  *         description: Internal server error
  */
 router.get("/:id/validate", validateFlowchart);
+
+/**
+ * @swagger
+ * /api/flowcharts/{id}/connected/{nodeName}:
+ *   get:
+ *     summary: Get all nodes connected to a specific node (directly or indirectly)
+ *     description: This endpoint will return all nodes that are connected to a specified node, either directly or indirectly.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: ID of the flowchart
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: nodeName
+ *         in: path
+ *         description: The name of the node to find all connected nodes for
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of all nodes connected to the specified node
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Whether the operation was successful
+ *                 data:
+ *                   type: array
+ *                   description: List of connected node names
+ *                   items:
+ *                     type: string
+ *       404:
+ *         description: Flowchart not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/:id/connected/:nodeName", getConnectedNodes);
 
 
 
